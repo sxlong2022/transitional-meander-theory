@@ -205,8 +205,8 @@ def assemble_swe_matrices(
     A[glob_r_down_v, glob_r_down_v] = 1.0
     A[glob_r_down_v, 0 * M + M - 1] = sigma_width
 
-    # 4.2 Sediment Boundary Condition: q_n' = +/- sigma * q_s'
-    # q_n' = v' - (r_s / beta) * d(zb')/dzeta, q_s' = Au * u'
+    # 4.2 Sediment Boundary Condition: q_y' = +/- sigma * q_s'
+    # q_y' = v' - (r_s / beta) * d(zb')/dzeta, q_s' = Au * u'
     # Upper bank (zeta = 1, index 0)
     glob_r_up_zb = 3 * M + 0
     A[glob_r_up_zb, :] = 0.0
