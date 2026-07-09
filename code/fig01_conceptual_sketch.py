@@ -61,7 +61,7 @@ def draw_channel_planview(ax, colors):
     w_val = W0 + dW * np.sin(np.pi * x_w / 12)
     ax.annotate('', xy=(x_w + 0.3, w_val), xytext=(x_w + 0.3, -w_val),
                 arrowprops=dict(arrowstyle='<->', color='gray', lw=1))
-    ax.text(x_w + 0.5, 0.2, r'$2B(s)$', fontsize=9, va='center', color='gray')
+    ax.text(x_w + 0.5, 0.2, r'$B(s)$', fontsize=9, va='center', color='gray')
     
     # Zone labels at top
     ax.text(2, 1.1, 'Converging', fontsize=8, style='italic', ha='center')

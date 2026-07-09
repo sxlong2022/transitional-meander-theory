@@ -8,7 +8,7 @@ This repository contains the reproducibility package for the WRR manuscript on t
 **Zenodo Archive & DOI**: [https://doi.org/10.5281/zenodo.21273728](https://doi.org/10.5281/zenodo.21273728)
 
 ### Recommended Citation
-> Song, X., Xu, H., & Bai, Y. (2026). Reproducibility Package for Asymmetric Mutual Enhancement of Central and Alternate Bars in Variable-Width Channels (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.21273728
+> Song, X., Xu, H., & Bai, Y. (2026). Reproducibility Package for Asymmetric Cross-Enhancement of Central and Alternate Bars in Variable-Width Channels (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.21273728
 
 ## Mathematical Framework Overview
 
