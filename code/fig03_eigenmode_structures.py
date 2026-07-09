@@ -156,7 +156,7 @@ def main():
     ax1.plot(y, mode_A_vec, '-', color=colors[4], linewidth=1.5) # Blue
     ax1.fill_between(y, 0, mode_A_vec, alpha=0.3, color=colors[4])
     ax1.axhline(0, color='gray', linestyle=':', linewidth=0.5)
-    ax1.set_xlabel(r'Transverse coordinate $n$')
+    ax1.set_xlabel(r'Normalized transverse coordinate $\zeta$')
     ax1.set_ylabel(r'Bed elevation $\hat{z}_b$')
     ax1.set_title(f'(a) Central bar ($k={mode_A_k}$)', fontsize=10)
     ax1.set_xlim(-1, 1)
@@ -167,7 +167,7 @@ def main():
     ax2.plot(y, mode_B_vec, '-', color=colors[6], linewidth=1.5) # Reddish Purple -> Alternate
     ax2.fill_between(y, 0, mode_B_vec, alpha=0.3, color=colors[6])
     ax2.axhline(0, color='gray', linestyle=':', linewidth=0.5)
-    ax2.set_xlabel(r'Transverse coordinate $n$')
+    ax2.set_xlabel(r'Normalized transverse coordinate $\zeta$')
     ax2.set_title(f'(b) Alternate bar ($k={mode_B_k}$)', fontsize=10)
     ax2.set_xlim(-1, 1)
     ax2.text(0, 0.7, 'Antisymmetric', ha='center', fontsize=8, style='italic')

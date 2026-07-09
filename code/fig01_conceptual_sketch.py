@@ -111,7 +111,7 @@ def draw_cross_sections(ax, colors):
     ax.set_xlim(-4, 4)
     ax.set_ylim(-0.6, 0.7)
     ax.set_ylabel('Bed elevation', fontsize=9)
-    ax.set_xlabel('Transverse coordinate $n$', fontsize=9)
+    ax.set_xlabel('Normalized transverse coordinate $\zeta$', fontsize=9)
     ax.set_title('(b) Cross-sectional bed profiles', fontsize=10, loc='left')
     ax.set_xticks([-1, 0, 1])
     ax.set_xticklabels(['-1', '0', '1'])

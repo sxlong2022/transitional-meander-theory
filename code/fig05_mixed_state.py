@@ -124,7 +124,7 @@ def main():
     
     # Decorations - Use curvilinear coordinates (s, n) for meandering rivers
     ax.set_xlabel('Streamwise coordinate $s$')
-    ax.set_ylabel('Transverse coordinate $n$')
+    ax.set_ylabel('Transverse coordinate $y$')
     ax.set_yticks([-1, 0, 1])
     
     cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
