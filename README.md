@@ -55,15 +55,22 @@ The benchmark extracts equilibrium central-bar and alternate-bar amplitudes by s
 ```
 transitional-meander-theory/
   code/
-    linear_solver.py          # Depth-averaged 2D SWE + Exner stability solver
-    landau_base.py            # Base LandauCalculator class (Chebyshev grid, adjoint solve)
-    landau_calculator.py      # LandauCoupledCalculator: adjoint projection for coupled modes
-    landlab_sweep.py          # 2D Landlab morphodynamic sweep for variable-width channels
-    figure_utils.py           # JFM figure styling and publication export utilities
-    phase_plane.py            # Phase-plane trajectories in (|A|, |B|) space
+    linear_solver.py              # Depth-averaged 2D SWE + Exner stability solver
+    landau_base.py                # Base LandauCalculator class (Chebyshev grid, adjoint solve)
+    landau_calculator.py          # LandauCoupledCalculator: adjoint projection for coupled modes
+    landlab_sweep.py              # 2D Landlab morphodynamic sweep for variable-width channels
+    diagnostics.py                # Symmetry and diagnostic metric calculations
+    figure_utils.py               # JFM figure styling and publication export utilities
+    fig01_conceptual_sketch.py    # Plots schematic diagrams (Figure 1)
+    fig02_phase_diagram.py        # Plots linear growth rates vs sigma (Figure 2)
+    fig03_eigenmode_structures.py # Plots transverse eigenmode profiles (Figure 3)
+    fig04_phase_plane.py          # Plots amplitude phase-plane trajectories (Figure 4)
+    fig05_mixed_state.py          # Reconstructs 2D bed topography (Figure 5)
+    fig06_gamma_BA_curve.py        # Plots cross-coupling coefficient vs sigma (Figure 6)
+    fig07_mechanism_schematic.py  # Plots coupling mechanism schematic (Figure 7)
   data/
     landlab_sweep_results.csv              # Pre-computed Landlab benchmark results
-    garcia_lugo_2015_parameters.csv        # Digitized experimental run parameters (Garcia Lugo et al., 2015)
+    garcia_lugo_2015_parameters.csv        # Digitized experimental run parameters (Garcia Lugo et al., 2015)Locally
     compare_confinement.py                 # Script to map confinement ratios to theoretical sigma
   README.md
 ```
@@ -76,11 +83,17 @@ transitional-meander-theory/
 | `code/landau_base.py` | Computes Chebyshev differentiation matrix, solves the direct and adjoint eigenproblems, and constructs quadratic/cubic nonlinear forcing vectors for mean-flow and second-harmonic modes. |
 | `code/landau_calculator.py` | Extends `landau_base.py` to compute the full set of coupled Landau coefficients (gamma_aa, gamma_ab, gamma_ba, gamma_bb) via adjoint projection. |
 | `code/landlab_sweep.py` | Runs the 2D morphodynamic benchmark for a list of width-gradient sigma values. Outputs equilibrium amplitudes to a CSV file. |
-| `code/phase_plane.py` | Integrates the coupled Landau amplitude equations with a fifth-order stabilizing term and plots trajectories from multiple initial conditions converging to the mixed-state equilibrium. |
+| `code/diagnostics.py` | Calculates symmetry metrics and profiles of alternate and central bars from 2D topography datasets. |
+| `code/fig01_conceptual_sketch.py` | Script to generate the conceptual planform and cross-section profiles (Figure 1). |
+| `code/fig02_phase_diagram.py` | Solves the linear stability matrices across a range of sigma and plots the linear growth rates (Figure 2). |
+| `code/fig03_eigenmode_structures.py` | Extracts and plots the transverse profiles of central and alternate bar eigenmodes (Figure 3). |
+| `code/fig04_phase_plane.py` | Integrates the coupled Landau amplitude equations with a fifth-order stabilizing term and plots trajectories from multiple initial conditions converging to the mixed-state equilibrium (Figure 4). |
+| `code/fig05_mixed_state.py` | Reconstructs and plots the 2D bed topography at the mixed-state fixed point (Figure 5). |
+| `code/fig06_gamma_BA_curve.py` | Computes the Landau coefficients across a range of sigma and plots the cross-coupling coefficient $\mathrm{Re}(\gamma_{BA})$ to highlight the cross-enhancement window (Figure 6). |
+| `code/fig07_mechanism_schematic.py` | Script to plot the schematic of the mean flow distortion and cross-enhancement mechanism (Figure 7). |
 | `data/landlab_sweep_results.csv` | Tabulated results from the Landlab sweep (sigma, simulated_A_eq, simulated_B_eq, simulated_ratio). |
 | `data/garcia_lugo_2015_parameters.csv` | Digitized experimental parameters (run ID, valley width, braiding index, morphology) for comparison with the theoretical width-gradient mapping. |
 | `data/compare_confinement.py` | Prints the experimental run table and maps valley-width confinement ratios to equivalent theoretical sigma values. |
-
 ## Installation Instructions
 
 ### Prerequisites
@@ -183,20 +196,34 @@ python data/compare_confinement.py
 
 This reads `data/garcia_lugo_2015_parameters.csv` and prints the mapped sigma values for the transitional (wandering) runs.
 
-### 4. Generate the Phase-Plane Figure
+### 4. Generate Figure Plots
 
-Reproduce Figure 4 showing phase-plane trajectories converging to the mixed-state equilibrium:
+You can run the individual plotting scripts in `code/` to reproduce each figure in the paper. All generated PDF/PNG plots are output to the repository root directory by default:
 
 ```bash
-python code/phase_plane.py
+# Figure 1: Conceptual planform and profile sketch
+python code/fig01_conceptual_sketch.py
+
+# Figure 2: Linear growth rates vs width gradient sigma
+python code/fig02_phase_diagram.py
+
+# Figure 3: Transverse eigenmode profile shapes
+python code/fig03_eigenmode_structures.py
+
+# Figure 4: Amplitude phase-plane trajectories and fixed point
+python code/fig04_phase_plane.py
+
+# Figure 5: Reconstructed 2D bed topography at mixed-state fixed point
+python code/fig05_mixed_state.py
+
+# Figure 6: Cross-coupling coefficient Re(gamma_BA) vs sigma
+python code/fig06_gamma_BA_curve.py
+
+# Figure 7: Physical coupling and mean flow distortion schematic
+python code/fig07_mechanism_schematic.py
 ```
 
-Output files:
-- `Fig4_phase_plane.pdf` (vector, for LaTeX)
-- `Fig4_phase_plane.png` (raster preview)
-
-If the JFM LaTeX template directory (`D:\Temp\JFM_LaTeX_Template_2`) exists, the PDF is copied there automatically.
-
+For each script, the vector PDF (suitable for LaTeX) and a raster PNG preview are generated.
 ## Expected Numerical Results
 
 ### Stabilized Mixed-State Amplitudes (Fifth-Order Stabilization)
@@ -223,7 +250,7 @@ These values should be kept synchronized across the Abstract, Results, Discussio
 1. **Conservation**: The linear solver conserves mass (fluid and sediment) in the integrated sense; the block-structure boundary conditions (v = +/- sigma * u at banks, sediment flux matching) are implemented in `assemble_swe_matrices`.
 2. **Scaling**: All lengths are non-dimensionalized by a reference depth D0 = 1.0 and half-width b0 = 1.0, so beta = B/H = 15 is dimensionless.
 3. **Neutral Limit**: When sigma = 0 (straight channel, no width oscillation), the linear solver recovers distinct marginal thresholds for alternate bars (m=1) and central bars (m=2).
-4. **Subcritical Stabilization**: The fifth-order term g5 * |A|^4 * A (g5 = 1e-6) bounds the growth of the subcritical central-bar mode. The phase-plane integrator (`phase_plane.py`) uses `solve_ivp` with tight tolerances (rtol=1e-8, atol=1e-10) to capture the slow approach to the mixed state.
+4. **Subcritical Stabilization**: The fifth-order term g5 * |A|^4 * A (g5 = 1e-6) bounds the growth of the subcritical central-bar mode. The phase-plane integrator (`fig04_phase_plane.py`) uses `solve_ivp` with tight tolerances (rtol=1e-8, atol=1e-10) to capture the slow approach to the mixed state.
 
 ## Reproducibility Checklist
 
@@ -231,7 +258,7 @@ These values should be kept synchronized across the Abstract, Results, Discussio
 - [ ] `code/linear_solver.py` imports without error
 - [ ] `code/landau_calculator.py` completes an adjoint projection for the test case above
 - [ ] `code/landlab_sweep.py` produces `code/landlab_sweep_results.csv`
-- [ ] `code/phase_plane.py` produces `Fig4_phase_plane.pdf` and `Fig4_phase_plane.png`
+- [ ] `code/fig04_phase_plane.py` produces `Fig4_phase_plane.pdf` and `Fig4_phase_plane.png`
 - [ ] Numerical values in the CSV and printed coefficients match the manuscript tables within solver tolerance
 
 ## License
