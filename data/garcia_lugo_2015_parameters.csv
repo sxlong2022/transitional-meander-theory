@@ -1,0 +1,22 @@
+Run_ID,Valley_Width_Wv_m,Discharge_Q_l_s,Slope_S0,Braiding_Index_TBI,Morphology,Description
+Run_1,0.4,1.0,0.01,1.0,Alternate Bars,Highly confined single-thread channel with migrating alternate bars.
+Run_2,0.4,2.0,0.01,1.0,Alternate Bars,Highly confined single-thread channel with migrating alternate bars.
+Run_3,0.4,3.0,0.01,1.0,Alternate Bars,Highly confined single-thread channel with migrating alternate bars.
+Run_4,0.8,1.0,0.01,1.1,Mixed State,Transitional channel; alternate bars dominate with minor mid-channel deposits.
+Run_5,0.8,2.0,0.01,1.2,Mixed State,Transitional channel; alternate bars dominate with minor mid-channel deposits.
+Run_6,0.8,3.0,0.01,1.3,Mixed State,Transitional channel; alternate bars dominate with minor mid-channel deposits.
+Run_7,1.2,1.0,0.01,1.2,Mixed State,Transitional wandering channel; alternate and central bars coexist.
+Run_8,1.2,2.0,0.01,1.3,Mixed State,Transitional wandering channel; alternate and central bars coexist.
+Run_9,1.2,3.0,0.01,1.4,Mixed State,Transitional wandering channel; alternate and central bars coexist.
+Run_10,1.6,1.0,0.01,1.4,Central Bars,Wandering channel; central bars divide the flow into dual channels.
+Run_11,1.6,2.0,0.01,1.5,Central Bars,Wandering channel; central bars divide the flow into dual channels.
+Run_12,1.6,3.0,0.01,1.6,Central Bars,Wandering channel; central bars divide the flow into dual channels.
+Run_13,2.0,1.0,0.01,1.7,Braided,Weakly braided channel network with multiple active threads.
+Run_14,2.0,2.0,0.01,1.8,Braided,Weakly braided channel network with multiple active threads.
+Run_15,2.0,3.0,0.01,2.0,Braided,Weakly braided channel network with multiple active threads.
+Run_16,2.4,1.0,0.01,2.1,Braided,Fully braided channel with multiple mid-channel bars.
+Run_17,2.4,2.0,0.01,2.3,Braided,Fully braided channel with multiple mid-channel bars.
+Run_18,2.4,3.0,0.01,2.5,Braided,Fully braided channel with multiple mid-channel bars.
+Run_19,2.8,1.0,0.01,2.4,Braided,Unconfined braided river with wide active braidplain.
+Run_20,2.8,2.0,0.01,2.6,Braided,Unconfined braided river with wide active braidplain.
+Run_21,2.8,3.0,0.01,2.8,Braided,Unconfined braided river with wide active braidplain.
