@@ -10,7 +10,7 @@ from scipy.integrate import solve_ivp
 
 
 def main():
-    figure_utils.set_jfm_style()
+    figure_utils.set_publication_style()
 
     # Coefficients from calculate_coupled_landau.py
     sigma_a = 0.3085 - 5.9616j
@@ -35,7 +35,7 @@ def main():
 
     # Multiple initial conditions
     A_eq_pure = 0.0  # Subcritical, no stable pure state at this order
-    colors = figure_utils.get_jfm_colors()
+    colors = figure_utils.get_publication_colors()
 
     initial_conditions = [
         ([1.0, 0.0, 1.0, 0.0], 'Small perturbation', colors[0]), # Orange
@@ -85,7 +85,7 @@ def main():
     plt.tight_layout()
 
     # Save
-    figure_utils.save_for_jfm(fig, 'Fig4_phase_plane')
+    figure_utils.save_for_publication(fig, 'Fig4_phase_plane')
     print("Figure 4 saved.")
 
 

@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.path import Path
 
-from figure_utils import set_jfm_style, save_for_jfm, get_jfm_colors
+from figure_utils import set_publication_style, save_for_publication, get_publication_colors
 
 def main():
-    set_jfm_style()
-    colors = get_jfm_colors()
+    set_publication_style()
+    colors = get_publication_colors()
     
     # Create figure
     fig, ax = plt.subplots(figsize=(6, 3.5))
@@ -87,7 +87,7 @@ def main():
     # (Summary text removed to avoid occlusion - detail is in caption)
 
     plt.tight_layout()
-    save_for_jfm(fig, 'Fig7_physical_mechanism')
+    save_for_publication(fig, 'Fig7_physical_mechanism')
     print("Figure 7 saved.")
 
 if __name__ == "__main__":

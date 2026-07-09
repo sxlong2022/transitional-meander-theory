@@ -8,7 +8,7 @@ import sys
 import os
 
 import matplotlib.pyplot as plt
-from figure_utils import set_jfm_style, save_for_jfm, get_jfm_colors
+from figure_utils import set_publication_style, save_for_publication, get_publication_colors
 import linear_solver as swe
 import diagnostics as diag
 import scipy.linalg as la
@@ -105,8 +105,8 @@ def compute_gamma_BA(sigma_val, params_base, N=16, k_c=2.0):
 # ------------------ Main ------------------
 
 def main():
-    set_jfm_style()
-    colors = get_jfm_colors()
+    set_publication_style()
+    colors = get_publication_colors()
     
     # Base parameters (fixed β = 10)
     params_base = {
@@ -204,8 +204,8 @@ def main():
     plt.tight_layout()
     
     # Save
-    save_for_jfm(fig, 'Fig6_gamma_BA_curve')
-    print("\nFigure 6 (1D version) saved.")
+    save_for_publication(fig, 'Fig6_gamma_BA_curve')
+    print("\nFigure 6 saved.")
 
 if __name__ == "__main__":
     main()

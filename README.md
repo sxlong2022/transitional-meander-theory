@@ -60,7 +60,7 @@ transitional-meander-theory/
     landau_calculator.py          # LandauCoupledCalculator: adjoint projection for coupled modes
     landlab_sweep.py              # 2D Landlab morphodynamic sweep for variable-width channels
     diagnostics.py                # Symmetry and diagnostic metric calculations
-    figure_utils.py               # JFM figure styling and publication export utilities
+    figure_utils.py               # Figure styling and publication export utilities
     fig01_conceptual_sketch.py    # Plots schematic diagrams (Figure 1)
     fig02_phase_diagram.py        # Plots linear growth rates vs sigma (Figure 2)
     fig03_eigenmode_structures.py # Plots transverse eigenmode profiles (Figure 3)
@@ -99,7 +99,7 @@ transitional-meander-theory/
 ### Prerequisites
 - Python 3.9 or later
 - Conda environment manager (recommended)
-- XeLaTeX (optional, only needed if copying figures to a JFM LaTeX template directory)
+- XeLaTeX (optional, for LaTeX compilation)
 
 ### Python Dependencies
 Install the required packages using pip or conda:

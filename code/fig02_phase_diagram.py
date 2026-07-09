@@ -24,7 +24,7 @@ def cheb_collocation(N):
     return D, x
 
 def main():
-    figure_utils.set_jfm_style()
+    figure_utils.set_publication_style()
     
     # Parameters
     params = {
@@ -90,7 +90,7 @@ def main():
         results['alternate'].append(best_alternate)
     
     # Plotting
-    colors = figure_utils.get_jfm_colors()
+    colors = figure_utils.get_publication_colors()
     fig, ax = plt.subplots(figsize=(5.5, 3.5))
     
     ax.plot(results['sigma'], results['central'], marker='o', color=colors[4], # Blue
@@ -129,7 +129,7 @@ def main():
     
     plt.tight_layout()
     
-    figure_utils.save_for_jfm(fig, 'Fig2_phase_diagram')
+    figure_utils.save_for_publication(fig, 'Fig2_phase_diagram')
     print("Figure 2 saved.")
 
 if __name__ == "__main__":

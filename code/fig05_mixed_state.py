@@ -57,8 +57,8 @@ def solve_mode(N, beta, Cf, Fr, alpha, sigma):
 from scipy.interpolate import BarycentricInterpolator
 
 def main():
-    # Set JFM Style
-    fu.set_jfm_style()
+    # Set publication style
+    fu.set_publication_style()
     
     # Parameters matches report
     sigma = 0.15
@@ -132,11 +132,11 @@ def main():
     # Regular tick values
     cbar.set_ticks([-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3])
     
-    # No title for JFM
+    # No title for publication
     
     # Save
-    # figure_utils.save_for_jfm now handles both PDF and PNG generation relative to base name
-    fu.save_for_jfm(fig, 'Fig5_mixed_state')
+    # figure_utils.save_for_publication now handles both PDF and PNG generation relative to base name
+    fu.save_for_publication(fig, 'Fig5_mixed_state')
 
 if __name__ == "__main__":
     main()

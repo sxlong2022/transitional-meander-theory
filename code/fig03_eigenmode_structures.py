@@ -24,7 +24,7 @@ def cheb_collocation(N):
     return D, x
 
 def main():
-    figure_utils.set_jfm_style()
+    figure_utils.set_publication_style()
     
     # Parameters
     params = {
@@ -148,7 +148,7 @@ def main():
     mode_B_vec = mode_B_vec / np.max(np.abs(mode_B_vec))
     
     # Plot
-    colors = figure_utils.get_jfm_colors()
+    colors = figure_utils.get_publication_colors()
     fig, axes = plt.subplots(1, 2, figsize=(6, 2.5), sharey=True)
     
     # Central Bar (Mode A)
@@ -174,7 +174,7 @@ def main():
     
     plt.tight_layout()
     
-    figure_utils.save_for_jfm(fig, 'Fig3_eigenmode_structures')
+    figure_utils.save_for_publication(fig, 'Fig3_eigenmode_structures')
     print("Figure 3 saved.")
 
 if __name__ == "__main__":

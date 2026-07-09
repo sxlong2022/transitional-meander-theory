@@ -11,7 +11,7 @@ from matplotlib.patches import Ellipse, Polygon
 import sys
 import os
 
-from figure_utils import set_jfm_style, get_jfm_colors
+from figure_utils import set_publication_style, get_publication_colors
 
 def draw_channel_planview(ax, colors):
     """Draw a plan view of a variable-width straight channel with bars."""
@@ -118,8 +118,8 @@ def draw_cross_sections(ax, colors):
 
 
 def main():
-    set_jfm_style()
-    colors = get_jfm_colors()
+    set_publication_style()
+    colors = get_publication_colors()
     
     fig, axes = plt.subplots(2, 1, figsize=(6, 4.5), height_ratios=[1.2, 1])
     
@@ -139,13 +139,7 @@ def main():
     print(f"[Local] Saved PNG to: {png_path}")
     print(f"[Local] Saved PDF to: {pdf_path}")
     
-    # Copy to publication folder
-    pub_dir = r"D:\Temp\JFM_LaTeX_Template_2"
-    if os.path.exists(pub_dir):
-        import shutil
-        shutil.copy(pdf_path, os.path.join(pub_dir, 'Fig1_conceptual_sketch.pdf'))
-        print(f"[Publication] Copied to: {pub_dir}")
-    
+    # Print local save status
     print("\nFigure 1 (Conceptual Sketch) saved.")
 
 if __name__ == "__main__":
