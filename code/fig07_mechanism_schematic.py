@@ -34,7 +34,7 @@ def main():
     
     # Decorate with a small schematic of Central Bar (Above node)
     y_schem = np.linspace(-1, 1, 50)
-    zb_A = np.cos(np.pi * y_schem)**2  # Schematic symmetric hump
+    zb_A = np.cos(np.pi * y_schem / 2)**2  # Schematic symmetric hump
     # Using bounds [x, y, width, height] in Data coordinates
     ax_mini_A = ax.inset_axes([1.0, 5.2, 1.0, 0.8], transform=ax.transData)
     ax_mini_A.plot(y_schem, zb_A, color=colors[0], lw=2)
@@ -60,7 +60,7 @@ def main():
             bbox=dict(boxstyle='round,pad=0.5', facecolor=colors[1], alpha=0.2, edgecolor=colors[1]))
 
     # Decorate with schematic of Alternate Bar (Above node)
-    zb_B = np.sin(np.pi * y_schem) # Schematic antisymmetric
+    zb_B = np.sin(np.pi * y_schem / 2) # Schematic antisymmetric
     ax_mini_B = ax.inset_axes([8.0, 2.2, 1.0, 0.8], transform=ax.transData)
     ax_mini_B.plot(y_schem, zb_B, color=colors[1], lw=2)
     ax_mini_B.text(0.5, 1.1, "bed", transform=ax_mini_B.transAxes, ha='center', fontsize=7)
@@ -80,8 +80,13 @@ def main():
                 arrowprops=dict(arrowstyle='->', color='black', lw=1.5, connectionstyle='arc3,rad=0.15'))
     ax.text(6.8, 2.0, "Modifies stability\n(cross-enhancement)", ha='center', fontsize=8, rotation=-25)
 
-    # Path 3: Direct Feedback (optional, maybe distracting, let's keep it creating a loop feeling)
-    # Let's show B benefiting
+    # Path 3: B -> A (Feedback / Suppression completing the loop)
+    # Mode B center: (8.5, 1.5), Mode A center: (1.5, 4.5)
+    ax.annotate("", xy=(1.5, 3.9), xytext=(8.0, 1.2),
+                arrowprops=dict(arrowstyle='->', color='black', lw=1.2, ls='--', connectionstyle='arc3,rad=-0.3'))
+    ax.text(4.5, 1.3, "Suppresses\n(competitive feedback)", color='black', ha='center', va='center', fontsize=8, rotation=-18, backgroundcolor='white')
+    
+    # Path 4: Mode B growth enhancement
     ax.text(8.5, 0.5, r"Growth rate $\uparrow$", ha='center', color=colors[6], fontsize=10, fontweight='bold')
     
     # (Summary text removed to avoid occlusion - detail is in caption)
