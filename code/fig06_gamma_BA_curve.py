@@ -186,7 +186,7 @@ def main():
         # Arrow annotation pointing straight up to the center of enhancement region (approx 0.06)
         # Hardcoded center for visual perfection as requested
         center_x = 0.05 
-        ax.annotate(r'$\gamma_{BA} < 0$', 
+        ax.annotate(r'$\mathrm{Re}(\gamma_{BA}) < 0$', 
                     xy=(center_x, -0.42), xytext=(center_x, 2.0),
                     fontsize=9, ha='center',
                     arrowprops=dict(arrowstyle='->', color='gray', lw=0.8),

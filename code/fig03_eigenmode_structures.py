@@ -129,8 +129,8 @@ def main():
     # The eigenvalue analysis at σ~0 returns spurious high-wavenumber modes.
     # For illustrating the canonical alternate bar SHAPE, use the analytical first mode.
     # This is standard practice in theoretical papers (cf. Colombini et al. 1987, Tubino 1991).
-    print("Using analytical sin(πn) for Alternate Bar (canonical shape).")
-    mode_B_vec = np.sin(np.pi * y)
+    print("Using analytical sin(πζ/2) for Alternate Bar (canonical shape).")
+    mode_B_vec = np.sin(np.pi / 2 * y)
     mode_B_k = "canonical"
     
     # Normalize and adjust signs
@@ -168,7 +168,10 @@ def main():
     ax2.fill_between(y, 0, mode_B_vec, alpha=0.3, color=colors[6])
     ax2.axhline(0, color='gray', linestyle=':', linewidth=0.5)
     ax2.set_xlabel(r'Normalized transverse coordinate $\zeta$')
-    ax2.set_title(f'(b) Alternate bar ($k={mode_B_k}$)', fontsize=10)
+    if mode_B_k == "canonical":
+        ax2.set_title('(b) Alternate bar (canonical shape)', fontsize=10)
+    else:
+        ax2.set_title(f'(b) Alternate bar ($k={mode_B_k}$)', fontsize=10)
     ax2.set_xlim(-1, 1)
     ax2.text(0, 0.7, 'Antisymmetric', ha='center', fontsize=8, style='italic')
     
