@@ -6,14 +6,11 @@ stability solver, the weakly nonlinear Stuart--Landau coefficient calculator, a 
 Landlab morphodynamic benchmark, and the scripts that generate every figure and
 sensitivity table in the paper and its Supporting Information.
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21273728.svg)](https://doi.org/10.5281/zenodo.21273728)
-
 **GitHub Repository**: [https://github.com/sxlong2022/transitional-meander-theory](https://github.com/sxlong2022/transitional-meander-theory)
-**Zenodo Archive & DOI**: [https://doi.org/10.5281/zenodo.21273728](https://doi.org/10.5281/zenodo.21273728)
 
 ### Recommended Citation
 
-> Song, X., Xu, H., & Bai, Y. (2026). Reproducibility Package for Asymmetric Cross-Enhancement of Central and Alternate Bars in Variable-Width Channels (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.21273728
+> Song, X., Xu, H., & Bai, Y. (2026). Reproducibility Package for Nonlinear Mode Coupling and Asymmetric Cross-Enhancement Between Central and Alternate Bars in Variable-Width Channels. GitHub. https://github.com/sxlong2022/transitional-meander-theory
 
 ## Physical and Mathematical Framework
 
