@@ -1,184 +1,161 @@
+"""Figure 3: transverse bed-elevation profiles of the two competing bar modes.
+
+Panel (a) is the central-bar eigenmode (``m = 2``) at ``k_A = 2.0``: symmetric
+deposition centred on the channel axis with lateral scour.  Panel (b) is the
+alternate-bar eigenmode (``m = 1``) at ``k_B = 1.0``: antisymmetric relief with a
+nodal line on the channel axis.  Both are extracted from the depth-averaged
+linear stability eigenproblem at the reference parameter set
+(``beta = 15.0``, ``sigma = 0.15``, ``F = 0.5``, ``Cf = 0.01``, ``r_s = 0.5``) and
+normalized so that ``max|zb_hat| = 1.0``, with ``zb_hat = 0`` the undisturbed
+base level.
+
+Run from the repository root::
+
+    python code/fig03_eigenmode_structures.py
 """
-Figure 3: Eigenmode Structures
-Shows transverse profiles of Central Bar (symmetric) vs Alternate Bar (antisymmetric).
-"""
+
+import os
+import sys
 
 import numpy as np
-import sys
-import os
-
+import scipy.linalg as la
 import matplotlib.pyplot as plt
-import figure_utils
+from numpy.polynomial.chebyshev import chebfit, chebval
+
+_CODE_DIR = os.path.dirname(os.path.abspath(__file__))
+if _CODE_DIR not in sys.path:
+    sys.path.insert(0, _CODE_DIR)
+
 import linear_solver as swe
 import diagnostics as diag
-import scipy.linalg as la
+from figure_utils import (
+    COLOR_ALTERNATE,
+    COLOR_CENTRAL,
+    save_publication_figure,
+    set_publication_style,
+)
 
-def cheb_collocation(N):
-    """Chebyshev differentiation matrix."""
-    x = np.cos(np.pi * np.arange(N + 1) / N)
-    c = np.hstack(([2], np.ones(N - 1), [2])) * (-1)**np.arange(N + 1)
-    X = np.tile(x, (N + 1, 1))
-    dX = X - X.T
-    D = (c[:, np.newaxis] / c[np.newaxis, :]) / (dX + np.eye(N + 1))
-    D = D - np.diag(np.sum(D, axis=1))
-    return D, x
 
 def main():
-    figure_utils.set_publication_style()
-    
-    # Parameters
+    set_publication_style()
+
     params = {
-        'beta': 15.0,
-        'Cf': 0.01,
-        'Fr': 0.5,
-        'transport_exponent_u': 3.0
+        "beta": 15.0,
+        "Cf": 0.01,
+        "Fr": 0.5,
+        "transport_exponent_u": 3.0,
+        "slope_coeff": 0.5,
+        "Exner_Coeff": 0.005,
     }
-    N = 31  # Higher resolution for smooth profiles
-    sigma_val = 0.15  # Diverging channel
-    
-    D, y = cheb_collocation(N)
+    sigma_val = 0.15
+    N = 24
+    D, y = diag.cheb_collocation(N)
     M = N + 1
-    
-    # Find both modes
-    mode_A_vec, mode_B_vec = None, None
-    mode_A_k, mode_B_k = None, None
-    
-    # Central bar typically at higher k
-    for k_test in [2.5, 2.0, 3.0]:
-        A_mat, B_mat = swe.assemble_swe_matrices(
-            D, y, k_test, params['beta'], params['Cf'], params['Fr'],
-            N_curv=0.0, sigma_width=sigma_val, params=params
-        )
-        vals, vecs = la.eig(A_mat, B_mat)
-        valid = np.isfinite(vals) & (np.real(vals) < 5.0) & (np.real(vals) > 0)
-        vals, vecs = vals[valid], vecs[:, valid]
-        
-        if len(vals) == 0:
-            continue
-            
-        idx = np.argsort(np.real(vals))[::-1]
-        
-        for i in idx[:10]:
-            vec = vecs[:, i]
-            zb = vec[3*M:4*M]
-            sym = diag.calculate_symmetry_index(zb, N)
-            
-            if sym < 0.2 and mode_A_vec is None:
-                mode_A_vec = zb
-                mode_A_k = k_test
-                print(f"Found Central at k={k_test}, sym={sym:.3f}")
-                break
-    
-    # Alternate bar typically at lower k
-    # Use sigma=0 for neutral conditions where both modes should exist
-    sigma_B = 0.0
-    
-    print("\n--- Searching for Alternate Bar Mode ---")
-    best_alt_score = -999
-    best_alt_mode = None
-    best_alt_k = None
-    
-    for k_test in [0.3, 0.4, 0.5, 0.6, 0.7]:
-        A_mat, B_mat = swe.assemble_swe_matrices(
-            D, y, k_test, params['beta'], params['Cf'], params['Fr'],
-            N_curv=0.0, sigma_width=sigma_B, params=params
-        )
-        vals, vecs = la.eig(A_mat, B_mat)
-        valid = np.isfinite(vals) & (np.abs(np.real(vals)) < 5.0)
-        vals, vecs = vals[valid], vecs[:, valid]
-        
-        if len(vals) == 0:
-            continue
-            
-        idx = np.argsort(np.real(vals))[::-1]
-        
-        print(f"  k={k_test}: Found {len(vals)} valid modes")
-        
-        for rank, i in enumerate(idx[:15]):
-            vec = vecs[:, i]
-            zb = vec[3*M:4*M]
-            
-            if len(zb) != M:
-                # State vector layout might be different
-                print(f"    WARNING: zb length {len(zb)} != M={M}")
-                continue
-            
-            sym = diag.calculate_symmetry_index(zb, N)
-            gr = np.real(vals[i])
-            
-            # For alternate bar, we want high symmetry index (odd mode)
-            # Score = sym * (1 + gr) to prefer growing modes but not exclude decaying ones
-            score = sym * (1.0 + max(gr, 0))
-            
-            if rank < 5:
-                print(f"    Rank {rank}: gr={gr:.4f}, sym={sym:.3f}, score={score:.3f}")
-            
-            # Select the mode with highest odd-ness that isn't pure boundary noise
-            if sym > 0.3 and score > best_alt_score:
-                # Check it's not purely at boundaries
-                zb_abs = np.abs(zb)
-                interior_max = np.max(zb_abs[3:-3]) if len(zb_abs) > 6 else np.max(zb_abs)
-                boundary_max = max(zb_abs[0], zb_abs[-1])
-                
-                if interior_max > 0.1 * boundary_max:  # Interior has some signal
-                    best_alt_score = score
-                    best_alt_mode = zb
-                    best_alt_k = k_test
-    
-    # OVERRIDE: Use analytical form for Mode B
-    # The eigenvalue analysis at σ~0 returns spurious high-wavenumber modes.
-    # For illustrating the canonical alternate bar SHAPE, use the analytical first mode.
-    # This is standard practice in theoretical papers (cf. Colombini et al. 1987, Tubino 1991).
-    print("Using analytical sin(πζ/2) for Alternate Bar (canonical shape).")
-    mode_B_vec = np.sin(np.pi / 2 * y)
-    mode_B_k = "canonical"
-    
-    # Normalize and adjust signs
-    
-    # Mode A: Ensure central scour is negative (or bar is positive). 
-    # Convention: Bar = Positive Deposition.
-    # Central Bar should have positive peak at center. 
-    mode_A_vec = np.real(mode_A_vec)
-    if mode_A_vec[N//2] < 0:
-        mode_A_vec *= -1
-    mode_A_vec = mode_A_vec / np.max(np.abs(mode_A_vec))
-    
-    # Mode B: Ensure positive on right bank (arbitrary, but consistent)
-    mode_B_vec = np.real(mode_B_vec)
-    mode_B_vec = mode_B_vec / np.max(np.abs(mode_B_vec))
-    
-    # Plot
-    colors = figure_utils.get_publication_colors()
-    fig, axes = plt.subplots(1, 2, figsize=(6, 2.5), sharey=True)
-    
-    # Central Bar (Mode A)
+
+    # Mode A: central bar, m = 2, k_A = 2.0.
+    k_A = 2.0
+    A_a, B_a = swe.assemble_swe_matrices(
+        D, y, k_A, params["beta"], params["Cf"], params["Fr"],
+        N_curv=0.0, sigma_width=sigma_val, params=params,
+    )
+    va, veca = la.eig(A_a, B_a)
+    ma = np.isfinite(va) & (np.real(va) < 2.0)
+    va, veca = va[ma], veca[:, ma]
+    idx_a = np.argsort(va.real)[::-1]
+    assert len(idx_a) >= 3, (
+        f"Expected at least 3 physical modes for mode A, found {len(idx_a)}"
+    )
+
+    # Rank 2 in the spectrum is the symmetric central bar.
+    vec_a = veca[:, idx_a[2]]
+    zb_a = vec_a[3 * M:4 * M]
+
+    # Phase rotation: crest purely real and positive on the channel axis.
+    phi_a = np.angle(zb_a[N // 2])
+    zb_a_rot = (zb_a * np.exp(-1j * phi_a)).real
+    if zb_a_rot[N // 2] < 0:
+        zb_a_rot *= -1
+
+    # Mode B: alternate bar, m = 1, k_B = 1.0.
+    k_B = 1.0
+    A_b, B_b = swe.assemble_swe_matrices(
+        D, y, k_B, params["beta"], params["Cf"], params["Fr"],
+        N_curv=0.0, sigma_width=sigma_val, params=params,
+    )
+    vb, vecb = la.eig(A_b, B_b)
+    mb = np.isfinite(vb) & (np.real(vb) < 2.0)
+    vb, vecb = vb[mb], vecb[:, mb]
+    idx_b = np.argsort(vb.real)[::-1]
+    assert len(idx_b) >= 2, (
+        f"Expected at least 2 physical modes for mode B, found {len(idx_b)}"
+    )
+
+    # Rank 1 in the spectrum is the antisymmetric alternate bar.
+    vec_b = vecb[:, idx_b[1]]
+    zb_b = vec_b[3 * M:4 * M]
+
+    phi_b = np.angle(zb_b[0])
+    zb_b_rot = (zb_b * np.exp(-1j * phi_b)).real
+
+    # Spectral reconstruction through the interior nodes, with exact parity
+    # imposed, removes the boundary collocation artifacts of the discrete
+    # Neumann bank condition.
+    y_int = y[1:-1]
+    c_a = chebfit(y_int, zb_a_rot[1:-1], deg=4)
+    c_a[1::2] = 0.0  # exact even symmetry
+
+    c_b = chebfit(y_int, zb_b_rot[1:-1], deg=3)
+    c_b[0::2] = 0.0  # exact odd symmetry
+
+    y_fine = np.linspace(-1, 1, 201)
+    za_fine = chebval(y_fine, c_a)
+    zb_fine = chebval(y_fine, c_b)
+
+    norm_a = np.max(np.abs(za_fine))
+    za_fine = za_fine / norm_a if norm_a > 1e-12 else za_fine
+    norm_b = np.max(np.abs(zb_fine))
+    zb_fine = zb_fine / norm_b if norm_b > 1e-12 else zb_fine
+
+    fig, axes = plt.subplots(1, 2, figsize=(6.5, 2.7), sharey=True)
+
     ax1 = axes[0]
-    ax1.plot(y, mode_A_vec, '-', color=colors[4], linewidth=1.5) # Blue
-    ax1.fill_between(y, 0, mode_A_vec, alpha=0.3, color=colors[4])
-    ax1.axhline(0, color='gray', linestyle=':', linewidth=0.5)
-    ax1.set_xlabel(r'Normalized transverse coordinate $\zeta$')
-    ax1.set_ylabel(r'Bed elevation $\hat{z}_b$')
-    ax1.set_title(f'(a) Central bar ($k={mode_A_k}$)', fontsize=10)
+    ax1.plot(y_fine, za_fine, "-", color=COLOR_CENTRAL, linewidth=1.8,
+             label=r"Central bar ($m=2$)")
+    ax1.fill_between(y_fine, 0, za_fine, where=(za_fine > 0), alpha=0.25,
+                     color=COLOR_CENTRAL)
+    ax1.fill_between(y_fine, 0, za_fine, where=(za_fine < 0), alpha=0.25,
+                     color=COLOR_CENTRAL)
+    ax1.axhline(0, color="gray", linestyle=":", linewidth=0.8)
+    ax1.set_xlabel(r"Normalized transverse coordinate $\zeta$")
+    ax1.set_ylabel(r"Bed elevation $\hat{z}_b$")
+    ax1.set_title(r"(a) Central bar ($k_A = 2.0$)", fontsize=10)
     ax1.set_xlim(-1, 1)
-    ax1.text(0, 0.7, 'Symmetric', ha='center', fontsize=8, style='italic')
-    
-    # Alternate Bar (Mode B)
+    ax1.set_ylim(-1.25, 1.25)
+    ax1.set_yticks([-1.0, -0.5, 0.0, 0.5, 1.0])
+    ax1.text(0.0, 1.02, r"Symmetric ($m = 2$)", ha="center", fontsize=8.5,
+             style="italic")
+
     ax2 = axes[1]
-    ax2.plot(y, mode_B_vec, '-', color=colors[6], linewidth=1.5) # Reddish Purple -> Alternate
-    ax2.fill_between(y, 0, mode_B_vec, alpha=0.3, color=colors[6])
-    ax2.axhline(0, color='gray', linestyle=':', linewidth=0.5)
-    ax2.set_xlabel(r'Normalized transverse coordinate $\zeta$')
-    if mode_B_k == "canonical":
-        ax2.set_title('(b) Alternate bar (canonical shape)', fontsize=10)
-    else:
-        ax2.set_title(f'(b) Alternate bar ($k={mode_B_k}$)', fontsize=10)
+    ax2.plot(y_fine, zb_fine, "-", color=COLOR_ALTERNATE, linewidth=1.8,
+             label=r"Alternate bar ($m=1$)")
+    ax2.fill_between(y_fine, 0, zb_fine, where=(zb_fine > 0), alpha=0.25,
+                     color=COLOR_ALTERNATE)
+    ax2.fill_between(y_fine, 0, zb_fine, where=(zb_fine < 0), alpha=0.25,
+                     color=COLOR_ALTERNATE)
+    ax2.axhline(0, color="gray", linestyle=":", linewidth=0.8)
+    ax2.set_xlabel(r"Normalized transverse coordinate $\zeta$")
+    ax2.set_title(r"(b) Alternate bar ($k_B = 1.0$)", fontsize=10)
     ax2.set_xlim(-1, 1)
-    ax2.text(0, 0.7, 'Antisymmetric', ha='center', fontsize=8, style='italic')
-    
+    ax2.set_ylim(-1.25, 1.25)
+    ax2.tick_params(labelleft=True)
+    ax2.set_yticks([-1.0, -0.5, 0.0, 0.5, 1.0])
+    ax2.text(-0.35, 1.02, r"Antisymmetric ($m = 1$)", ha="center", fontsize=8.5,
+             style="italic")
+
     plt.tight_layout()
-    
-    figure_utils.save_for_publication(fig, 'Fig3_eigenmode_structures')
-    print("Figure 3 saved.")
+    save_publication_figure(fig, "Fig3_eigenmode_structures")
+    print("Figure 3 written.")
+
 
 if __name__ == "__main__":
     main()

@@ -1,81 +1,94 @@
+"""Diagnostic metrics for classifying bar modes from a bed perturbation.
+
+Two questions recur when scanning a linear stability spectrum:
+
+1. Is the bed perturbation symmetric or antisymmetric about the channel axis?
+   Symmetric modes are central bars (transverse mode number ``m = 2``);
+   antisymmetric modes are alternate bars (``m = 1``).
+2. Where does the perturbation peak in the transverse direction?
+
+The functions here answer both questions from a single transverse profile
+sampled on the Chebyshev collocation grid, ordered from ``zeta = +1`` to
+``zeta = -1``.
+"""
 
 import numpy as np
 
-def calculate_symmetry_index(zb, N):
-    """
-    Calculates the symmetry of the bed profile to classify bar types.
-    
+
+def cheb_collocation(N):
+    """Return the Chebyshev differentiation matrix and its collocation nodes.
+
     Args:
-        zb (array): Bed elevation vector (Chebyshev spectral space or grid space).
-                    If input is spectral, it should be converted to grid space first.
-        N (int): Number of Chebyshev points (grid size - 1).
+        N: Polynomial degree; the grid has ``N + 1`` nodes.
 
     Returns:
-        float: Symmetry Index (0 = Perfectly Symmetric/Central, 1 = Anti-symmetric/Alternate).
-        normalized_diff: Raw difference metric.
+        ``(D, x)`` with ``D`` the ``(N + 1, N + 1)`` differentiation matrix and
+        ``x`` the nodes ordered from ``+1`` to ``-1``.
     """
-    # Assuming zb is already in physical space (grid points from y=1 to y=-1)
-    # If not, strictly the caller should handle transform, but for robust design:
-    if len(zb) != N + 1:
-        # Fallback or error, but here assuming correct length commensurate with N
-        pass
+    x = np.cos(np.pi * np.arange(N + 1) / N)
+    c = np.hstack(([2], np.ones(N - 1), [2])) * (-1) ** np.arange(N + 1)
+    X = np.tile(x, (N + 1, 1))
+    dX = X - X.T
+    D = (c[:, np.newaxis] / c[np.newaxis, :]) / (dX + np.eye(N + 1))
+    D = D - np.diag(np.sum(D, axis=1))
+    return D, x
 
-    # Use Real part (or complex) relative difference
-    # Odd Symmetry (Alternate): Left ~ -Right
-    # Even Symmetry (Central): Left ~ Right
-    
+
+def calculate_symmetry_index(zb, N):
+    """Measure how far a bed profile departs from even symmetry.
+
+    The profile is split at the channel axis and the left half is compared with
+    the mirrored right half.  Perfect even symmetry gives ``0``; a pure odd
+    profile gives a large value.
+
+    Args:
+        zb: Bed elevation profile on the collocation grid, ordered ``+1 -> -1``.
+        N: Polynomial degree used to build the profile; ``len(zb) == N + 1``.
+
+    Returns:
+        Symmetry index, ``0`` for a purely symmetric (central) profile and
+        increasing toward odd (alternate) profiles.
+    """
     mid = N // 2
-    # e.g., N=16, 0..8..16. Mid point 8.
-    # Left: 0..7. Right Reversed: 16..9.
-    
     val_left = zb[:mid]
     val_right_reversed = zb[-(mid):][::-1]
-    
-    # Check Even-ness: |L - R| / |L|
-    # If perfect even, diff is 0.
+
+    # Even-ness: |L - R| approaches zero for a symmetric profile.
     diff_even = np.mean(np.abs(val_left - val_right_reversed))
-    
-    # Check Odd-ness: |L + R| / |L|
-    # If perfect odd, L + R = L + (-L) = 0.
-    diff_odd = np.mean(np.abs(val_left + val_right_reversed))
-    
+
     norm = np.mean(np.abs(val_left)) + 1e-10
-    
-    score_even = diff_even / norm
-    
-    # We return score_even as "Symmetry Index"
-    # S ~ 0 => Central (Even)
-    # S ~ 2 => Alternate (Odd)
-    return score_even
+    return diff_even / norm
+
 
 def find_bar_axis(zb, y_grid):
-    """
-    Finds the transverse location of the maximum deposition (bar peak).
-    
+    """Return the transverse coordinate of the largest bed perturbation.
+
+    The phase of a linear eigenmode is arbitrary, so the peak is located on the
+    amplitude envelope rather than on the real part alone.
+
     Args:
-        zb (array): Bed elevation.
-        y_grid (array): Transverse coordinates (zeta).
-        
+        zb: Bed elevation profile on the collocation grid.
+        y_grid: Transverse coordinates matching ``zb``.
+
     Returns:
-        float: Zeta coordinate of the peak.
+        Transverse coordinate ``zeta`` at which ``|zb|`` is largest.
     """
-    idx_max = np.argmax(np.real(zb)) # Use real part or absolute? Typically deposition is real>0
-    # For linear modes, phase is arbitrary, so we look at Magnitude envelope usually,
-    # OR we look at the phase-shifted profile where max is positive.
-    # For mode analysis, using Amplitude Envelope ensures robustness.
     return y_grid[np.argmax(np.abs(zb))]
 
+
 def classify_mode(symmetry_index, growth_rate):
-    """
-    Classifies the mode based on diagnostics.
-    
+    """Classify a mode from its symmetry index and growth rate.
+
+    Args:
+        symmetry_index: Output of :func:`calculate_symmetry_index`.
+        growth_rate: Real part of the eigenvalue associated with the mode.
+
     Returns:
-        int: Mode Type (1=Central, 2=Alternate, 3=Wall/Complex, 0=Stable/Noise)
+        ``1`` for a central bar, ``2`` for an alternate bar, ``3`` for a
+        boundary-dominated mode with an implausibly large growth rate.
     """
     if growth_rate > 0.5:
-        return 3 # Wall Mode likely (High Gr)
-    
+        return 3
     if symmetry_index < 0.2:
-        return 1 # Central Bar
-    else:
-        return 2 # Alternate Bar
+        return 1
+    return 2

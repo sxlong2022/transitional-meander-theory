@@ -1,5 +1,20 @@
+# Python bytecode
 __pycache__/
 *.pyc
-.DS_Store
+*.pyo
+
+# Rendered figures (regenerate with code/fig0*.py)
+figures/
 *.pdf
 *.png
+
+# Landlab topography dumps written by code/landlab_sweep.py
+data/landlab_topo*.npz
+*.npz
+
+# Environment and editor clutter
+.venv/
+venv/
+.DS_Store
+.idea/
+.vscode/
